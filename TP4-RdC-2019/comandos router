@@ -1,0 +1,10 @@
+enable 
+
+connfig term
+
+router bgp 201
+
+show run
+
+ipv6 unicast-routing
+

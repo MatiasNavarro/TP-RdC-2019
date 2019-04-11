@@ -1,0 +1,379 @@
+version: '2.1'
+
+services:
+  #R1 --------------------------- 
+  r1:
+    build: .
+    volumes:
+      - ./volumes/quagga/r1/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/r1/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisord.conf:ro
+    image: ospf:20190321
+    privileged: true
+    ports:
+      #admin
+      - 10011:2601
+      #ospf ipv6
+      - 10013:2606
+    networks:
+      R1_JOKER:
+        ipv6_address: 200c::2
+      R1_WW:
+        ipv6_address: 200d::2
+      R1_R2:
+        ipv6_address: 2006::2
+      R1_R3:
+        ipv6_address: 2007::2
+
+  #R2 --------------------------- 
+  r2:
+    build: .
+    volumes:
+      - ./volumes/quagga/r2/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/r2/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisord.conf:ro
+    image: ospf:20190321
+    privileged: true
+    ports:
+      #admin
+      - 10021:2601
+      #ospf ipv6
+      - 10023:2606
+    networks:
+      R2_FLASH:
+        ipv6_address: 200f::10
+      R2_BATMAN:
+        ipv6_address: 200e::10
+      R1_R2:
+        ipv6_address: 2006::10
+      R2_R3:
+        ipv6_address: 2008::10
+
+  #R3 --------------------------- 
+  r3:
+    build: .
+    volumes:
+      - ./volumes/quagga/r3/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/r3/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisord.conf:ro
+    image: ospf:20190321
+    privileged: true
+    ports:
+      #admin
+      - 10031:2601
+      #ospf ipv6
+      - 10033:2606
+    networks:
+      R3_SUPERMAN:
+        ipv6_address: 2005::10
+      R3_ARROW:
+        ipv6_address: 2002::10
+      R1_R3:
+        ipv6_address: 2007::10
+      R2_R3:
+        ipv6_address: 2008::2
+  
+  #JOKER --------------------------- 
+  joker:
+    build: .
+    volumes:
+      - ./volumes/quagga/joker/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/joker/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisord.conf:ro
+    image: ospf:20190321
+    privileged: true
+    ports:
+      #admin
+      - 10045:2601
+      #ospf ipv6
+      - 10047:2606
+    networks:
+      R1_JOKER:
+        ipv6_address: 200c::10
+      JOKER_WW:
+        ipv6_address: 200a::10
+      JOKER_MARCIAN:
+        ipv6_address: 2009::10
+
+
+  #WW ---------------------------       
+  ww:
+    build: .
+    volumes:
+      - ./volumes/quagga/ww/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/ww/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisord.conf:ro
+    image: ospf:20190321
+    privileged: true
+    ports:
+      #admin
+      - 10051:2601
+      #ospf ipv6
+      - 10053:2606
+    networks:
+      R1_WW:
+        ipv6_address: 200d::10
+      JOKER_WW:
+        ipv6_address: 200a::2
+      WW_LOOP:
+        ipv6_address: 200b::10
+
+  #FLASH ---------------------------       
+  flash:
+    build: .
+    volumes:
+      - ./volumes/quagga/flash/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/flash/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisord.conf:ro
+    image: ospf:20190321
+    privileged: true
+    ports:
+      #admin
+      - 10061:2601
+      #ospf ipv6
+      - 10063:2606
+    networks:
+      R2_FLASH:
+        ipv6_address: 200f::2
+      FLASH_BATMAN:
+        ipv6_address: 2011::10
+      FLASH_AQUAMAN:
+        ipv6_address: 2012::10
+
+  #BATMAN --------------------------- 
+  batman:
+    volumes:
+      - ./volumes/quagga/batman/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/batman/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisord.conf:ro
+    image: ospf:20190321
+    privileged: true
+    ports:
+      #admin
+      - 10071:2601
+      #ospf ipv6
+      - 10073:2606
+    networks:
+      R2_BATMAN:
+        ipv6_address: 200e::2
+      FLASH_BATMAN:
+        ipv6_address: 2011::2
+      BATMAN_LOOP:
+        ipv6_address: 2013::10
+  
+  #SUPERMAN --------------------------- 
+  superman:
+    build: .
+    volumes:
+      - ./volumes/quagga/superman/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/superman/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisord.conf:ro
+    image: ospf:20190321
+    privileged: true
+    ports:
+      #admin
+      - 10081:2601
+      #ospf ipv6
+      - 10083:2606
+    networks:
+      R3_SUPERMAN:
+        ipv6_address: 2005::2
+      SUPERMAN_ARROW:
+        ipv6_address: 2003::10
+      SUPERMAN_LOOP:
+        ipv6_address: 2004::10
+
+  #ARROW ---------------------------      
+  arrow:
+    build: .
+    volumes:
+      - ./volumes/quagga/arrow/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./volumes/quagga/arrow/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./volumes/supervisord.conf:/etc/supervisord.conf:ro
+    image: ospf:20190321
+    privileged: true
+    ports:
+      #admin
+      - 10091:2601
+      #ospf ipv6
+      - 10093:2606
+    networks:
+      R3_ARROW:
+        ipv6_address: 2002::2
+      SUPERMAN_ARROW:
+        ipv6_address: 2003::2
+      ARROW_SHAZAM:
+        ipv6_address: 2001::10
+
+################################### HOST ##########################################
+  #MARCIAN --------------------------- 
+  marcian:
+    image:  alpine
+    command: top 
+    privileged: true
+    networks:
+      JOKER_MARCIAN:
+        ipv6_address: 2009::7
+
+  #AQUAMAN ---------------------------       
+  aquaman:
+    image:  alpine
+    command: top 
+    privileged: true
+    networks:
+      FLASH_AQUAMAN:
+        ipv6_address: 2012::7
+
+   #SHAZAM ---------------------------  
+  shazam:
+    image:  alpine
+    command: top 
+    privileged: true
+    networks:
+      ARROW_SHAZAM:
+        ipv6_address: 2001::7
+
+
+networks:
+  R1_JOKER:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 200c::/64
+  R1_WW:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 200d::/64
+  R1_R2:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2006::/64
+  R1_R3:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2007::/64
+
+  R2_FLASH:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 200f::/64
+
+  R2_BATMAN:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 200e::/64
+
+  R2_R3:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2008::/64
+
+  R3_SUPERMAN:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2005::/64
+
+  R3_ARROW:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2002::/64
+
+  JOKER_MARCIAN:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2009::/64
+  
+  JOKER_WW:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 200a::/64
+
+  WW_LOOP:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 200b::/64
+
+  FLASH_AQUAMAN:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2012::/64
+
+  FLASH_BATMAN:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2011::/64
+
+  BATMAN_LOOP:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2013::/64
+
+  SUPERMAN_ARROW:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2003::/64
+
+  SUPERMAN_LOOP:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2004::/64
+
+  ARROW_SHAZAM:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2001::/64
+
+              

@@ -1,0 +1,126 @@
+version: '2.1'
+
+services:
+  b1:
+    build: ./../images/bgp/.
+    volumes:
+      - ./../volumes/bgp/b1/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./../volumes/bgp/b1/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./../volumes/bgp/b1/bgpd.conf:/etc/quagga/bgpd.conf:ro
+      - ./../volumes/bgp/supervisord.conf:/etc/supervisord.conf:ro
+    image: bgp:20180508
+    privileged: true
+    ports:
+      #admin
+      - 10101:2601
+      #ospf ipv6
+      - 10103:2606
+      #bgp
+      - 10104:2605
+    networks:
+      oam:
+        ipv6_address: 2001::5
+      nr1b1:
+        ipv6_address: 2001:aaaa:aaaa::5
+  b2:
+    build: ./../images/bgp/.
+    volumes:
+      - ./../volumes/bgp/b2/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./../volumes/bgp/b2/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./../volumes/bgp/b2/bgpd.conf:/etc/quagga/bgpd.conf:ro
+      - ./../volumes/bgp/supervisord.conf:/etc/supervisord.conf:ro
+    image: bgp:20180508
+    privileged: true
+    ports:
+      #admin
+      - 10201:2601
+      #ospf ipv6
+      - 10203:2606
+      #bgp
+      - 10204:2605
+    networks:
+      oam:
+        ipv6_address: 2001::6
+      nr2b2:
+        ipv6_address: 2001:bbbb:bbbb::6
+
+  r1:
+    build: ./../images/ospf/.
+    volumes:
+      - ./../volumes/ospf/r1/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./../volumes/ospf/r1/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./../volumes/ospf/supervisord.conf:/etc/supervisord.conf:ro
+    image: ospf:20180508
+    privileged: true
+    ports:
+      #admin
+      - 10111:2601
+      #ospf ipv6
+      - 10113:2606
+    networks:
+      nr1b1:
+        ipv6_address: 2001:aaaa:aaaa::10
+      nr1:
+        ipv6_address: 2001:aaaa:1111::10
+          
+  r2:
+    build: ./../images/ospf/.
+    image: ospf:20180508
+    volumes:
+      - ./../volumes/ospf/r2/zebra.conf:/etc/quagga/zebra.conf:ro
+      - ./../volumes/ospf/r2/ospf6d.conf:/etc/quagga/ospf6d.conf:ro
+      - ./../volumes/ospf/supervisord.conf:/etc/supervisord.conf:ro
+    privileged: true
+    ports:
+      #admin
+      - 10211:2601
+      #ospf ipv6
+      - 10213:2606
+    networks:
+      nr2b2:
+        ipv6_address: 2001:bbbb:bbbb::10
+      nr2:
+        ipv6_address: 2001:bbbb:2222::10
+        
+    networks:
+      nr2b2:
+        ipv6_address: 2001:bbbb:bbbb::10
+      nr2:
+        ipv6_address: 2001:bbbb:2222::10
+
+networks:
+  oam:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2001::/64
+  nr1b1:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2001:aaaa:aaaa::/64
+  nr2b2:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2001:bbbb:bbbb::/64
+  nr1:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2001:aaaa:1111::/64
+  nr2:
+    driver: "bridge"
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 2001:bbbb:2222::/64

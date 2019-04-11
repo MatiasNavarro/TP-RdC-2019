@@ -1,0 +1,97 @@
+node n1 {
+    type router
+    model router
+    network-config {
+	hostname Router1
+	!
+	interface eth1
+	 ip address 192.168.2.1/24
+	 ipv6 address 2001:aaaa:dddd:1::1/64
+	 mac address 00:00:00:aa:00:00
+	!
+	interface eth0
+	 ip address 192.168.1.1/24
+	 ipv6 address 2001:aaaa:bbbb:1::1/64
+	 mac address 00:00:00:aa:00:01
+	!
+    }
+    canvas c1
+    iconcoords {452.0 210.0}
+    labelcoords {452.0 242.0}
+    services {zebra OSPFv2 OSPFv3 vtysh IPForward}
+    interface-peer {eth0 n2}
+    interface-peer {eth1 n3}
+}
+
+node n2 {
+    type router
+    model host
+    network-config {
+	hostname Cliente1
+	!
+	interface eth0
+	 ip address 192.168.1.10/24
+	 ipv6 address 2001:aaaa:bbbb:1::10/64
+	 mac address 00:00:00:aa:00:00
+	!
+    }
+    canvas c1
+    iconcoords {56.0 210.0}
+    labelcoords {56.0 242.0}
+    services {DefaultRoute SSH}
+    interface-peer {eth0 n1}
+}
+
+node n3 {
+    type router
+    model host
+    network-config {
+	hostname Cliente2
+	!
+	interface eth0
+	 ip address 192.168.2.10/24
+	 ipv6 address 2001:aaaa:dddd:1::10/64
+	 mac address 00:00:00:aa:00:03
+	!
+    }
+    canvas c1
+    iconcoords {844.0 209.0}
+    labelcoords {844.0 241.0}
+    services {DefaultRoute SSH}
+    interface-peer {eth0 n1}
+}
+
+link l1 {
+    nodes {n2 n1}
+}
+
+link l2 {
+    nodes {n1 n3}
+}
+
+canvas c1 {
+    name {Canvas1}
+}
+
+option global {
+    interface_names no
+    ip_addresses yes
+    ipv6_addresses yes
+    node_labels yes
+    link_labels yes
+    show_api no
+    background_images no
+    annotations yes
+    grid yes
+    traffic_start 0
+}
+
+option session {
+    controlnet=
+    controlnet_updown_script=
+    enablerj45=1
+    enablesdt=0
+    preservedir=0
+    sdturl=tcp://127.0.0.1:50000/
+}
+
